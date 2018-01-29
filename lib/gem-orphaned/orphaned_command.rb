@@ -16,29 +16,29 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   end
 
   def read_preferred_gems
-    prefered_gems_path = File.expand_path('~/.preferred_gems')
-    if File.exist?(prefered_gems_path)
-      @preferred_gems += File.read().split("\n")
+    @preferred_gems = DefaultPreferredGems.dup
+    preferred_gems_path = File.expand_path('~/.preferred_gems')
+    if File.exist?(preferred_gems_path)
+      @preferred_gems += File.read(preferred_gems_path).split("\n")
     end
   end
 
   def read_gems
-    gems = {}
+    @gems = {}
     Gem::Specification.each do |spec|
       unless @preferred_gems.include?(spec.name)
-        gems[spec.name] ||= []
-        gems[spec.name] << spec
+        @gems[spec.name] ||= []
+        @gems[spec.name] << spec
       end
     end
-    gems.delete_if do |name, specs|
+    @gems.delete_if do |name, specs|
       specs.find(&:default_gem?)
     end
-    gems
   end
 
   def show_orphaned_gems(&block)
-    gems.each do |name, specs|
-      specs.select { |s| s.dependent_gems.empty? }.each { |s| show_spec(s) } }
+    @gems.each do |name, specs|
+      specs.select { |s| s.dependent_gems.empty? }.each { |s| show_spec(s) }
     end
   end
 
