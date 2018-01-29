@@ -1,11 +1,11 @@
 class Gem::Commands::OrphanedCommand < Gem::Command
 
   DefaultPreferredGems = %w{
+    gem-orphaned
     rubygems-update
   }
 
   def initialize
-    @preferred_gems = DefaultPreferredGems.dup
     super 'orphaned', %q{Show orphaned gems}
   end
 
