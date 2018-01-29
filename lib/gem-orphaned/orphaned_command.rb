@@ -8,6 +8,9 @@ class Gem::Commands::OrphanedCommand < Gem::Command
 
   def initialize
     super 'orphaned', %q{Show orphaned gems}
+    add_option('--sudo', "Run sudo before 'gem uninstall <gem>'") do |value, options|
+      options[:sudo] = true
+    end
   end
 
   def execute
@@ -49,7 +52,10 @@ class Gem::Commands::OrphanedCommand < Gem::Command
       print "Remove #{spec.name}? [Yn] "
       case STDIN.gets.chomp
       when 'y', ''
-        system('gem', 'uninstall', spec.name)
+        args = []
+        args += ['sudo'] if options[:sudo]
+        args += ['gem', 'uninstall', spec.name]
+        system(*args)
         break
       when 'n'
         break
