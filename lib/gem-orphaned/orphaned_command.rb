@@ -1,6 +1,7 @@
 class Gem::Commands::OrphanedCommand < Gem::Command
 
   DefaultPreferredGems = %w{
+    bundler
     gem-orphaned
     rubygems-update
   }
