@@ -49,7 +49,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
       print "Remove #{spec.name}? [Yn] "
       case STDIN.gets.chomp
       when 'y', ''
-        system('gem', 'uninstall', spec.name)
+        Gem::Uninstaller.new(spec.name).uninstall
         break
       when 'n'
         break
