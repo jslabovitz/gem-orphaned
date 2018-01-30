@@ -52,14 +52,16 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   end
 
   def show_spec(spec)
-    puts "#{spec.name} (#{spec.version})"
     loop do
-      print "Remove #{spec.name}? [Yn] "
+      print "#{spec.name} (#{spec.version}) [remove, Ignore, add]? "
       case STDIN.gets.chomp
-      when 'y', ''
+      when 'r'
         Gem::Uninstaller.new(spec.name).uninstall
         break
-      when 'n'
+      when 'i', ''
+        break
+      when 'a'
+        add_preferred_gem(spec)
         break
       else
         puts '?'
