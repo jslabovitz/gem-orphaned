@@ -1,5 +1,6 @@
 class Gem::Commands::OrphanedCommand < Gem::Command
 
+  PreferredGemsFile = File.expand_path('~/.preferred_gems')
   DefaultPreferredGems = %w{
     bundler
     gem-orphaned
@@ -18,9 +19,16 @@ class Gem::Commands::OrphanedCommand < Gem::Command
 
   def read_preferred_gems
     @preferred_gems = DefaultPreferredGems.dup
-    preferred_gems_path = File.expand_path('~/.preferred_gems')
-    if File.exist?(preferred_gems_path)
-      @preferred_gems += File.read(preferred_gems_path).split("\n")
+    preferred_gems_path =
+    if File.exist?(PreferredGemsFile)
+      @preferred_gems += File.read(PreferredGemsFile).split("\n").reject(&:empty?)
+    end
+  end
+
+  def add_preferred_gem(spec)
+    @preferred_gems << spec.name
+    File.open(PreferredGemsFile, 'w') do |io|
+      @preferred_gems.sort.each { |name| io.puts name }
     end
   end
 
