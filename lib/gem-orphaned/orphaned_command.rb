@@ -1,3 +1,5 @@
+require 'set'
+
 class Gem::Commands::OrphanedCommand < Gem::Command
 
   PreferredGemsFile = File.expand_path('~/.preferred_gems')
@@ -18,8 +20,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   end
 
   def read_preferred_gems
-    @preferred_gems = DefaultPreferredGems.dup
-    preferred_gems_path =
+    @preferred_gems = Set.new(DefaultPreferredGems)
     if File.exist?(PreferredGemsFile)
       @preferred_gems += File.read(PreferredGemsFile).split("\n").reject(&:empty?)
     end
