@@ -49,13 +49,10 @@ class Gem::Commands::OrphanedCommand < Gem::Command
         @gems[spec.name] << spec
       end
     end
-    @gems.delete_if do |name, specs|
-      specs.find(&:default_gem?)
-    end
   end
 
   def show_orphaned_gems(&block)
-    @gems.each do |name, specs|
+    @gems.reject { |n, s| s.find(&:default_gem?) }.each do |name, specs|
       specs.select { |s| s.dependent_gems.empty? }.each { |s| show_spec(s) }
     end
   end
