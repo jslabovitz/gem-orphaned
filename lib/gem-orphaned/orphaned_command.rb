@@ -10,7 +10,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   }
 
   def initialize
-    super 'orphaned', %q{Show orphaned gems}
+    super 'orphaned', 'Show orphaned gems'
   end
 
   def execute
