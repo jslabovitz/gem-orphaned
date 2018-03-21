@@ -17,6 +17,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
     read_preferred_gems
     read_gems
     show_orphaned_gems
+    save_preferred_gems
   end
 
   def read_preferred_gems
@@ -24,12 +25,19 @@ class Gem::Commands::OrphanedCommand < Gem::Command
     if File.exist?(PreferredGemsFile)
       @preferred_gems += File.read(PreferredGemsFile).split("\n").reject(&:empty?)
     end
+    @dirty = false
   end
 
   def add_preferred_gem(spec)
     @preferred_gems << spec.name
-    File.open(PreferredGemsFile, 'w') do |io|
-      @preferred_gems.sort.each { |name| io.puts name }
+    @dirty = true
+  end
+
+  def save_preferred_gems
+    if @dirty
+      File.open(PreferredGemsFile, 'w') do |io|
+        @preferred_gems.sort.each { |name| io.puts name }
+      end
     end
   end
 
