@@ -14,65 +14,56 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   end
 
   def execute
-    read_preferred_gems
     read_gems
+    read_preferred_gems
+    check_preferred_gems
     show_orphaned_gems
-    save_preferred_gems
-  end
-
-  def read_preferred_gems
-    @preferred_gems = Set.new(DefaultPreferredGems)
-    if File.exist?(PreferredGemsFile)
-      @preferred_gems += File.read(PreferredGemsFile).split("\n").reject(&:empty?)
-    end
-    @dirty = false
-  end
-
-  def add_preferred_gem(spec)
-    @preferred_gems << spec.name
-    @dirty = true
-  end
-
-  def save_preferred_gems
-    if @dirty
-      File.open(PreferredGemsFile, 'w') do |io|
-        @preferred_gems.sort.each { |name| io.puts name }
-      end
-    end
   end
 
   def read_gems
     @gems = {}
     Gem::Specification.each do |spec|
-      unless @preferred_gems.include?(spec.name)
-        @gems[spec.name] ||= []
-        @gems[spec.name] << spec
+      @gems[spec.name] ||= []
+      @gems[spec.name] << spec
+    end
+  end
+
+  def read_preferred_gems
+    @preferred_gems = DefaultPreferredGems
+    @preferred_gems += default_gems
+    if File.exist?(PreferredGemsFile)
+      data = File.read(PreferredGemsFile)
+      lines = data.split("\n").map { |s| s.sub(/#.*/, '').strip }.reject(&:empty?)
+      @preferred_gems += lines
+    end
+    @preferred_gems.uniq!
+  end
+
+  def check_preferred_gems
+    @preferred_gems.each do |name|
+      unless @gems[name]
+        puts "#{name}: in preferred list but not installed"
       end
     end
   end
 
-  def show_orphaned_gems(&block)
-    @gems.reject { |n, s| s.find(&:default_gem?) }.each do |name, specs|
-      specs.select { |s| s.dependent_gems.empty? }.each { |s| show_spec(s) }
+  def show_orphaned_gems
+    orphaned_gems.each do |spec|
+      puts "#{spec.name} (#{spec.version}): orphaned"
     end
   end
 
-  def show_spec(spec)
-    loop do
-      print "#{spec.name} (#{spec.version}) [remove, Ignore, add]? "
-      case STDIN.gets.chomp
-      when 'r'
-        Gem::Uninstaller.new(spec.name).uninstall
-        break
-      when 'i', ''
-        break
-      when 'a'
-        add_preferred_gem(spec)
-        break
-      else
-        puts '?'
-      end
-    end
+  def default_gems
+    @gems.select do |name, specs|
+      specs.find(&:default_gem?)
+    end.keys
+  end
+
+  def orphaned_gems
+    names = @gems.keys - @preferred_gems
+    @gems.values_at(*names).map do |specs|
+      specs.select { |s| s.dependent_gems.empty? }
+    end.flatten
   end
 
 end
