@@ -1,11 +1,8 @@
 #encoding: utf-8
 
-require 'rubygems/command'
-require_relative 'lib/gem-orphaned/version'
-
 Gem::Specification.new do |s|
   s.name          = 'gem-orphaned'
-  s.version       = Gem::Commands::OrphanedCommand::VERSION
+  s.version       = '0.5'
   s.summary       = %q{Show orphaned gems}
   s.description   = %q{A Ruby gem which shows orphaned gems.}
   s.author        = 'John Labovitz'
@@ -17,6 +14,5 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map { |f| File.basename(f) }
   s.require_path  = 'lib'
 
-  s.add_development_dependency 'rake', '~> 12.3'
-  s.add_development_dependency 'rubygems-tasks', '~> 0.2'
+  s.add_development_dependency 'rake', '~> 13.0'
 end
