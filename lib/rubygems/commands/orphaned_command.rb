@@ -1,3 +1,4 @@
+require 'rubygems/command'
 require 'set'
 
 class Gem::Commands::OrphanedCommand < Gem::Command
