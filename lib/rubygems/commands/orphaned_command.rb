@@ -4,11 +4,6 @@ require 'set'
 class Gem::Commands::OrphanedCommand < Gem::Command
 
   PreferredGemsFile = File.expand_path('~/.preferred_gems')
-  DefaultPreferredGems = %w{
-    bundler
-    gem-orphaned
-    rubygems-update
-  }
 
   def initialize
     super 'orphaned', 'Show orphaned gems'
@@ -30,7 +25,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
   end
 
   def read_preferred_gems
-    @preferred_gems = DefaultPreferredGems
+    @preferred_gems = []
     @preferred_gems += default_gems
     if File.exist?(PreferredGemsFile)
       data = File.read(PreferredGemsFile)
