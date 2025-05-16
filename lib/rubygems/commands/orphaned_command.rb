@@ -28,8 +28,7 @@ class Gem::Commands::OrphanedCommand < Gem::Command
     @preferred_gems = []
     @preferred_gems += default_gems
     if File.exist?(PreferredGemsFile)
-      data = File.read(PreferredGemsFile)
-      lines = data.split("\n").map { |s| s.sub(/#.*/, '').strip }.reject(&:empty?)
+      lines = File.readlines(PreferredGemsFile).map { |s| s.sub(/#.*/, '').strip }.reject(&:empty?)
       @preferred_gems += lines
     end
     @preferred_gems.uniq!
